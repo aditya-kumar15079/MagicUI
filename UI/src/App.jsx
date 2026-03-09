@@ -1,42 +1,59 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { decrement, increment } from "./reducers/counterSlice";
-import Loader from "./components/common/Loader";
+import useCanvas from './hooks/useCanvas';
+import useDivider from './hooks/useDivider';
+import { FILTERS } from './constants/canvasConstants';
+import TitleBar from './components/canvas/TitleBar';
+import Toolbar from './components/canvas/Toolbar';
+import SplitView from './components/canvas/SplitView';
+import DrawingCanvas from './components/canvas/DrawingCanvas';
+import PreviewPane from './components/canvas/PreviewPane';
+import StatusBar from './components/canvas/StatusBar';
 
-function App() {
-  // const [count, setCount] = useState(0);
-  const count = useSelector((state) => state.counter.value);
-  const dispatch = useDispatch();
+export default function App() {
+  const canvas  = useCanvas();
+  const divider = useDivider();
+
+  const activeFilter = FILTERS.find((f) => f.id === canvas.filter);
 
   return (
-    <>
-      <h1 className="text-sm">React + Tailwind Template</h1>
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center">
-          <label className="mr-10 font-bold">Buttons:</label>
-          <button type="button" className="primary-button" onClick={() => dispatch(increment())}>
-            increment
-          </button>
-          <button type="button" className="secondary-button mx-4" onClick={() => dispatch(decrement())}>
-            decrement
-          </button>
-          <label>Counter: {count}</label>
-        </div>
+    <div className="flex flex-col h-screen bg-[#1e1e1e] overflow-hidden" style={{ userSelect: 'none' }}>
+      <TitleBar activeFilterLabel={activeFilter.label} />
 
-        <div className="flex items-center">
-          <label className="mr-10 font-bold">Disabled:</label>
-          <button type="button" className="primary-button" disabled={true}>
-            Fetch data
-          </button>
-        </div>
+      <Toolbar
+        tool={canvas.tool}               onToolChange={canvas.setTool}
+        color={canvas.color}             onColorChange={canvas.setColor}
+        brushSize={canvas.brushSize}     onBrushSizeChange={canvas.setBrushSize}
+        filter={canvas.filter}           onFilterChange={canvas.setFilter}
+        onClear={canvas.clearCanvas}
+        onDownload={canvas.downloadCanvas}
+      />
 
-        <div className="flex items-center">
-          <label className="mr-10 font-bold">Loader:</label>
-          <Loader />
-        </div>
-      </div>
-    </>
+      <SplitView
+        dividerPos={divider.dividerPos}
+        containerRef={divider.containerRef}
+        startDivDrag={divider.startDivDrag}
+        activeFilter={activeFilter}
+        leftPanel={
+          <DrawingCanvas
+            canvasRef={canvas.canvasRef}
+            tool={canvas.tool}
+            onMouseDown={canvas.onMouseDown}
+            onMouseMove={canvas.onMouseMove}
+            onStopDrawing={canvas.stopDrawing}
+          />
+        }
+        rightPanel={
+          <PreviewPane src={canvas.previewSrc} activeFilter={activeFilter} />
+        }
+      />
+
+      <StatusBar
+        mousePos={canvas.mousePos}
+        tool={canvas.tool}
+        brushSize={canvas.brushSize}
+        color={canvas.color}
+        activeFilter={activeFilter}
+      />
+    </div>
   );
 }
 
-export default App;
