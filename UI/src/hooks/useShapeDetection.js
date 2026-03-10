@@ -1,17 +1,19 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/detect-shapes';
-const DEBOUNCE_MS = 400;
 
-const useShapeDetection = (strokes, canvasW, canvasH) => {
-  const [shapes, setShapes]     = useState([]);
-  const [loading, setLoading]   = useState(false);
-  const timerRef                = useRef(null);
-  const abortRef                = useRef(null);
-  const lastStrokeLenRef        = useRef(0);
+const useShapeDetection = (canvasW, canvasH) => {
+  const [shapes, setShapes]   = useState([]);
+  const [loading, setLoading] = useState(false);
+  const abortRef              = useRef(null);
 
-  const detectShapes = useCallback(async (strokesToSend) => {
+  const detectShapes = useCallback(async (strokes) => {
+    if (!strokes || strokes.length === 0) {
+      setShapes([]);
+      return;
+    }
+
     // Cancel any in-flight request
     if (abortRef.current) {
       abortRef.current.abort();
@@ -22,7 +24,7 @@ const useShapeDetection = (strokes, canvasW, canvasH) => {
     setLoading(true);
     try {
       const payload = {
-        strokes: strokesToSend.map((s) => ({
+        strokes: strokes.map((s) => ({
           points: s.points,
           color:  s.color,
           width:  s.width,
@@ -50,26 +52,7 @@ const useShapeDetection = (strokes, canvasW, canvasH) => {
     }
   }, [canvasW, canvasH]);
 
-  useEffect(() => {
-    // Only fire when strokes actually change
-    if (strokes.length === 0) {
-      setShapes([]);
-      lastStrokeLenRef.current = 0;
-      return;
-    }
-
-    if (strokes.length === lastStrokeLenRef.current) return;
-    lastStrokeLenRef.current = strokes.length;
-
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      detectShapes(strokes);
-    }, DEBOUNCE_MS);
-
-    return () => clearTimeout(timerRef.current);
-  }, [strokes, detectShapes]);
-
-  return { shapes, loading };
+  return { shapes, loading, detectShapes };
 };
 
 export default useShapeDetection;

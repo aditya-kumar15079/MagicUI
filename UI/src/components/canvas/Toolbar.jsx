@@ -15,6 +15,7 @@ const Toolbar = memo(function Toolbar({
   brushSize, onBrushSizeChange,
   filter, onFilterChange,
   onClear, onDownload,
+  onDetect, detecting,
 }) {
   const dotSize = Math.min(brushSize, 22);
 
@@ -109,6 +110,9 @@ const Toolbar = memo(function Toolbar({
       <Sep />
 
       {/* Actions */}
+      <button onClick={onDetect} disabled={detecting} className={BTN_ACTION}>
+        {detecting ? '⏳ Detecting…' : '✨ Detect Shapes'}
+      </button>
       <button onClick={onClear}    className={BTN_ACTION}>🗑 Clear</button>
       <button onClick={onDownload} className={BTN_ACTION}>⬇ Save</button>
     </div>
@@ -126,6 +130,8 @@ Toolbar.propTypes = {
   onFilterChange:    PropTypes.func.isRequired,
   onClear:           PropTypes.func.isRequired,
   onDownload:        PropTypes.func.isRequired,
+  onDetect:          PropTypes.func.isRequired,
+  detecting:         PropTypes.bool.isRequired,
 };
 
 export default Toolbar;

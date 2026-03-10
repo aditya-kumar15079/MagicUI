@@ -12,7 +12,7 @@ import StatusBar from './components/canvas/StatusBar';
 export default function App() {
   const canvas  = useCanvas();
   const divider = useDivider();
-  const { shapes, loading } = useShapeDetection(canvas.strokes, CANVAS_W, CANVAS_H);
+  const { shapes, loading, detectShapes } = useShapeDetection(CANVAS_W, CANVAS_H);
 
   const activeFilter = FILTERS.find((f) => f.id === canvas.filter);
 
@@ -27,6 +27,8 @@ export default function App() {
         filter={canvas.filter}           onFilterChange={canvas.setFilter}
         onClear={canvas.clearCanvas}
         onDownload={canvas.downloadCanvas}
+        onDetect={() => detectShapes(canvas.strokes)}
+        detecting={loading}
       />
 
       <SplitView
