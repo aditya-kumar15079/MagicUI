@@ -1,6 +1,7 @@
 import useCanvas from './hooks/useCanvas';
 import useDivider from './hooks/useDivider';
-import { FILTERS } from './constants/canvasConstants';
+import useShapeDetection from './hooks/useShapeDetection';
+import { FILTERS, CANVAS_W, CANVAS_H } from './constants/canvasConstants';
 import TitleBar from './components/canvas/TitleBar';
 import Toolbar from './components/canvas/Toolbar';
 import SplitView from './components/canvas/SplitView';
@@ -11,6 +12,7 @@ import StatusBar from './components/canvas/StatusBar';
 export default function App() {
   const canvas  = useCanvas();
   const divider = useDivider();
+  const { shapes, loading } = useShapeDetection(canvas.strokes, CANVAS_W, CANVAS_H);
 
   const activeFilter = FILTERS.find((f) => f.id === canvas.filter);
 
@@ -42,7 +44,12 @@ export default function App() {
           />
         }
         rightPanel={
-          <PreviewPane src={canvas.previewSrc} activeFilter={activeFilter} />
+          <PreviewPane
+            src={canvas.previewSrc}
+            activeFilter={activeFilter}
+            shapes={shapes}
+            loading={loading}
+          />
         }
       />
 

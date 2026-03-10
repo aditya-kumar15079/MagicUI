@@ -9,6 +9,10 @@ const useCanvas = () => {
   const [previewSrc, setPreviewSrc] = useState('');
   const [mousePos, setMousePos]     = useState({ x: 0, y: 0 });
 
+  // Stroke collection for shape detection
+  const [strokes, setStrokes]       = useState([]);
+  const currentStrokeRef            = useRef([]);
+
   const canvasRef     = useRef(null);
   const isDrawingRef  = useRef(false);
   const lastPosRef    = useRef(null);
@@ -41,6 +45,7 @@ const useCanvas = () => {
     const size = tool === 'eraser' ? brushSize * 4 : brushSize;
     isDrawingRef.current = true;
     lastPosRef.current   = pos;
+    currentStrokeRef.current = [{ x: pos.x, y: pos.y }];
     ctx.beginPath();
     ctx.arc(pos.x, pos.y, size / 2, 0, Math.PI * 2);
     ctx.fillStyle = tool === 'eraser' ? '#ffffff' : color;
@@ -54,6 +59,7 @@ const useCanvas = () => {
     if (!isDrawingRef.current) return;
     const ctx  = canvasRef.current.getContext('2d');
     const size = tool === 'eraser' ? brushSize * 4 : brushSize;
+    currentStrokeRef.current.push({ x: pos.x, y: pos.y });
     ctx.beginPath();
     ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
     ctx.lineTo(pos.x, pos.y);
@@ -69,14 +75,25 @@ const useCanvas = () => {
   const stopDrawing = useCallback(() => {
     if (isDrawingRef.current) {
       isDrawingRef.current = false;
+      // Save completed stroke (only for pen, not eraser)
+      if (tool !== 'eraser' && currentStrokeRef.current.length >= 3) {
+        const stroke = {
+          points: currentStrokeRef.current,
+          color,
+          width: brushSize,
+        };
+        setStrokes((prev) => [...prev, stroke]);
+      }
+      currentStrokeRef.current = [];
       schedulePreview();
     }
-  }, [schedulePreview]);
+  }, [schedulePreview, tool, color, brushSize]);
 
   const clearCanvas = useCallback(() => {
     const ctx = canvasRef.current.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    setStrokes([]);
     schedulePreview();
   }, [schedulePreview]);
 
@@ -95,6 +112,7 @@ const useCanvas = () => {
     filter, setFilter,
     previewSrc,
     mousePos,
+    strokes,
     onMouseDown,
     onMouseMove,
     stopDrawing,

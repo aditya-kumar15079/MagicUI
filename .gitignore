@@ -1,1 +1,7 @@
 .github/skills
+UI/node_modules
+UI/dist
+UI/build
+Backend/venv
+Backend/__pycache__
+Backend/*.pyc
