@@ -8,7 +8,7 @@ An intelligent drawing application that combines freehand sketching with real-ti
 
 ## Features
 
-- **Freehand Drawing** — Sketch freely with a pen tool on a 2000×700 canvas
+- **Freehand Drawing** — Sketch freely with a pen tool on a 1920×1080 canvas
 - **Real-time Shape Detection** — Strokes are analyzed via OpenCV and converted to clean SVG shapes (circles, ovals, rectangles, squares, triangles, polygons)
 - **Live Split-View Preview** — Drawing canvas on the left, vectorized preview on the right with a draggable divider
 - **Image Filters** — 6 filters (Original, Grayscale, Sepia, Invert, Vivid, Dream) applied to the preview
@@ -102,8 +102,8 @@ Accepts an array of strokes and returns detected geometric shapes.
       "width": 6.0
     }
   ],
-  "canvas_width": 2000,
-  "canvas_height": 700
+  "canvas_width": 1920,
+  "canvas_height": 1080
 }
 ```
 

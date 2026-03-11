@@ -5,3 +5,4 @@ UI/build
 Backend/venv
 Backend/__pycache__
 Backend/*.pyc
+.env

@@ -17,6 +17,7 @@ const useCanvas = () => {
   const isDrawingRef  = useRef(false);
   const lastPosRef    = useRef(null);
   const rafRef        = useRef(null);
+  const undoStackRef  = useRef([]);
 
   useEffect(() => {
     const ctx = canvasRef.current.getContext('2d');
@@ -34,12 +35,24 @@ const useCanvas = () => {
   }, []);
 
   const getPos = useCallback((e) => {
-    const r = canvasRef.current.getBoundingClientRect();
-    return { x: e.clientX - r.left, y: e.clientY - r.top };
+    const canvas = canvasRef.current;
+    const r = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / r.width;
+    const scaleY = canvas.height / r.height;
+    return {
+      x: (e.clientX - r.left) * scaleX,
+      y: (e.clientY - r.top) * scaleY,
+    };
+  }, []);
+
+  const saveSnapshot = useCallback(() => {
+    const dataUrl = canvasRef.current.toDataURL();
+    undoStackRef.current.push(dataUrl);
   }, []);
 
   const onMouseDown = useCallback((e) => {
     if (e.button !== 0) return;
+    saveSnapshot();
     const pos  = getPos(e);
     const ctx  = canvasRef.current.getContext('2d');
     const size = tool === 'eraser' ? brushSize * 4 : brushSize;
@@ -51,7 +64,7 @@ const useCanvas = () => {
     ctx.fillStyle = tool === 'eraser' ? '#ffffff' : color;
     ctx.fill();
     schedulePreview();
-  }, [tool, color, brushSize, getPos, schedulePreview]);
+  }, [tool, color, brushSize, getPos, schedulePreview, saveSnapshot]);
 
   const onMouseMove = useCallback((e) => {
     const pos = getPos(e);
@@ -89,11 +102,27 @@ const useCanvas = () => {
     }
   }, [schedulePreview, tool, color, brushSize]);
 
+  const undo = useCallback(() => {
+    const stack = undoStackRef.current;
+    if (stack.length === 0) return;
+    const prev = stack.pop();
+    const img = new window.Image();
+    img.onload = () => {
+      const ctx = canvasRef.current.getContext('2d');
+      ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+      ctx.drawImage(img, 0, 0);
+      schedulePreview();
+    };
+    img.src = prev;
+    setStrokes((prev) => prev.slice(0, -1));
+  }, [schedulePreview]);
+
   const clearCanvas = useCallback(() => {
     const ctx = canvasRef.current.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
     setStrokes([]);
+    undoStackRef.current = [];
     schedulePreview();
   }, [schedulePreview]);
 
@@ -116,6 +145,7 @@ const useCanvas = () => {
     onMouseDown,
     onMouseMove,
     stopDrawing,
+    undo,
     clearCanvas,
     downloadCanvas,
   };

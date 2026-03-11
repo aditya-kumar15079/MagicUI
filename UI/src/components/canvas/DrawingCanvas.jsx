@@ -11,8 +11,8 @@ const DrawingCanvas = memo(function DrawingCanvas({
   return (
     <canvas
       ref={canvasRef}
-      width={2000}
-      height={700}
+      width={1920}
+      height={1080}
       className="block"
       style={{ cursor: tool === 'eraser' ? 'cell' : 'crosshair' }}
       onMouseDown={onMouseDown}

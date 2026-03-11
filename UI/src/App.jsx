@@ -1,6 +1,7 @@
 import useCanvas from './hooks/useCanvas';
 import useDivider from './hooks/useDivider';
 import useShapeDetection from './hooks/useShapeDetection';
+import useGenerateUI from './hooks/useGenerateUI';
 import { FILTERS, CANVAS_W, CANVAS_H } from './constants/canvasConstants';
 import TitleBar from './components/canvas/TitleBar';
 import Toolbar from './components/canvas/Toolbar';
@@ -13,6 +14,7 @@ export default function App() {
   const canvas  = useCanvas();
   const divider = useDivider();
   const { shapes, loading, detectShapes } = useShapeDetection(CANVAS_W, CANVAS_H);
+  const { generatedImage, generating, generateUI, clearGeneratedUI } = useGenerateUI();
 
   const activeFilter = FILTERS.find((f) => f.id === canvas.filter);
 
@@ -25,10 +27,14 @@ export default function App() {
         color={canvas.color}             onColorChange={canvas.setColor}
         brushSize={canvas.brushSize}     onBrushSizeChange={canvas.setBrushSize}
         filter={canvas.filter}           onFilterChange={canvas.setFilter}
+        onUndo={canvas.undo}
         onClear={canvas.clearCanvas}
         onDownload={canvas.downloadCanvas}
         onDetect={() => detectShapes(canvas.strokes)}
         detecting={loading}
+        onGenerateUI={() => generateUI(canvas.canvasRef)}
+        generating={generating}
+        onClearPreview={clearGeneratedUI}
       />
 
       <SplitView
@@ -51,6 +57,8 @@ export default function App() {
             activeFilter={activeFilter}
             shapes={shapes}
             loading={loading}
+            generatedImage={generatedImage}
+            generating={generating}
           />
         }
       />

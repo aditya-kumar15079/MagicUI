@@ -87,7 +87,7 @@ function renderShape(shape, i) {
 
 /* ── Main component ─────────────────────────────────────────── */
 
-const PreviewPane = function PreviewPane({ src, activeFilter, shapes, loading }) {
+const PreviewPane = function PreviewPane({ src, activeFilter, shapes, loading, generatedImage, generating }) {
   const hasShapes = shapes && shapes.length > 0;
 
   return (
@@ -123,11 +123,21 @@ const PreviewPane = function PreviewPane({ src, activeFilter, shapes, loading })
         </svg>
       )}
 
+      {/* Generated UI overlay */}
+      {generatedImage && (
+        <img
+          src={generatedImage}
+          alt="Generated UI"
+          className="absolute inset-0 object-contain"
+          style={{ width: CANVAS_W, height: CANVAS_H }}
+        />
+      )}
+
       {/* Loading indicator */}
-      {loading && (
+      {(loading || generating) && (
         <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 rounded bg-[#0e639c]/80 text-white text-[10px] font-mono">
           <span className="inline-block w-2 h-2 rounded-full bg-white animate-pulse" />
-          Detecting…
+          {generating ? 'Generating UI…' : 'Detecting…'}
         </div>
       )}
     </div>
@@ -143,12 +153,16 @@ PreviewPane.propTypes = {
   }).isRequired,
   shapes:  PropTypes.array,
   loading: PropTypes.bool,
+  generatedImage: PropTypes.string,
+  generating: PropTypes.bool,
 };
 
 PreviewPane.defaultProps = {
   src: '',
   shapes: [],
   loading: false,
+  generatedImage: null,
+  generating: false,
 };
 
 export default PreviewPane;

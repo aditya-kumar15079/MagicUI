@@ -14,8 +14,10 @@ const Toolbar = memo(function Toolbar({
   color, onColorChange,
   brushSize, onBrushSizeChange,
   filter, onFilterChange,
-  onClear, onDownload,
+  onUndo, onClear, onDownload,
   onDetect, detecting,
+  onGenerateUI, generating,
+  onClearPreview,
 }) {
   const dotSize = Math.min(brushSize, 22);
 
@@ -113,7 +115,12 @@ const Toolbar = memo(function Toolbar({
       <button onClick={onDetect} disabled={detecting} className={BTN_ACTION}>
         {detecting ? '⏳ Detecting…' : '✨ Detect Shapes'}
       </button>
+      <button onClick={onGenerateUI} disabled={generating} className={`${BTN_BASE} text-[#4ec9b0] hover:bg-[#3a3a3a]`}>
+        {generating ? '⏳ Generating…' : '🎨 Generate UI'}
+      </button>
+      <button onClick={onUndo}     className={BTN_ACTION}>↩ Undo</button>
       <button onClick={onClear}    className={BTN_ACTION}>🗑 Clear</button>
+      <button onClick={onClearPreview} className={BTN_ACTION}>🧹 Clear Preview</button>
       <button onClick={onDownload} className={BTN_ACTION}>⬇ Save</button>
     </div>
   );
@@ -128,10 +135,14 @@ Toolbar.propTypes = {
   onBrushSizeChange: PropTypes.func.isRequired,
   filter:            PropTypes.string.isRequired,
   onFilterChange:    PropTypes.func.isRequired,
+  onUndo:             PropTypes.func.isRequired,
   onClear:           PropTypes.func.isRequired,
   onDownload:        PropTypes.func.isRequired,
   onDetect:          PropTypes.func.isRequired,
   detecting:         PropTypes.bool.isRequired,
+  onGenerateUI:      PropTypes.func.isRequired,
+  generating:        PropTypes.bool.isRequired,
+  onClearPreview:    PropTypes.func.isRequired,
 };
 
 export default Toolbar;

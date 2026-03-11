@@ -1,5 +1,5 @@
-export const CANVAS_W = 2000;
-export const CANVAS_H = 700;
+export const CANVAS_W = 1920;
+export const CANVAS_H = 1080;
 
 export const PALETTE = [
   '#e74c3c', '#e67e22', '#f1c40f', '#2ecc71',

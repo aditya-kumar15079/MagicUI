@@ -144,8 +144,8 @@ def _make_polygon(approx: np.ndarray, contour: np.ndarray, n: int) -> dict:
 
 def detect_shapes(
     strokes: list[list[dict]],
-    canvas_w: int = 2000,
-    canvas_h: int = 700,
+    canvas_w: int = 1920,
+    canvas_h: int = 1080,
     stroke_colors: list[str] | None = None,
     stroke_widths: list[float] | None = None,
 ) -> list[dict]:

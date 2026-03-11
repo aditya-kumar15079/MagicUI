@@ -669,13 +669,14 @@ Every user prompt submitted in this repository's AI chat **must be logged** to `
 ### Format
 
 ```markdown
-- **YYYY-MM-DD**: <prompt text>
+- **YYYY-MM-DD** [Model Name]: <prompt text>
 ```
 
 ### Rules
 
-- Append each new prompt under the correct date heading (`## YYYY-MM-DD`).
-- If the date heading does not exist, create it.
+- Always append new prompts **at the bottom** of the file under the latest date heading.
+- If the date heading does not exist, create it at the bottom.
+- Include the AI model name (e.g., `Claude Opus 4.6`, `GPT-4o`, etc.) in square brackets after the date.
 - Log the prompt **as-is** — do not paraphrase or summarize.
 - This step is **non-optional** — every response must include this log update.
 - The log file lives at: `my_prompts.md` (project root).
